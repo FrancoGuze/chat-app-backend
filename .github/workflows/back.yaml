@@ -20,6 +20,9 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
+      - name: dependencias pnpm
+        uses: pnpm install
+
       - name: Install node
         uses: actions/setup-node@v4
 
@@ -34,5 +37,6 @@ jobs:
 
       #- name: Run integration tests
       #  run: npm run test:integration
+
       - name: deploy
         run: railway up --service=${{ env.SVC_ID }}
