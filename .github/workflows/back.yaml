@@ -1,0 +1,40 @@
+name: CI/CD Backend
+
+on:
+  push:
+    branches:
+      - devops
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      SVC_ID: 8bd17c02-5dfe-4916-9a31-4337190090d8
+      RAILWAY_TOKEN: e10ff48f-18da-42e3-8647-ff920d2861e4
+
+    steps:
+      - name: Check code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install node
+        uses: actions/setup-node@v4
+
+      - name: dependencias
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint
+
+      #- name: Run tests
+      #  run: npm test
+
+      #- name: Run integration tests
+      #  run: npm run test:integration
+      - name: deploy
+        run: railway up --service=${{ env.SVC_ID }}
