@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SVC_ID: 8bd17c02-5dfe-4916-9a31-4337190090d8
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_TOKEN: e10ff48f-18da-42e3-8647-ff920d2861e4
 
     steps:
       - name: Check code
