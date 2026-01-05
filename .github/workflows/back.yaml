@@ -16,6 +16,14 @@ jobs:
       - name: Check code
         uses: actions/checkout@v4
 
+      - name: Check secrets
+        run: |
+          if [ -z "${{ secrets.RAILWAY_TOKEN }}" ]; then
+            echo "❌ RAILWAY_TOKEN no está configurado"
+            exit 1
+          fi
+          echo "✅ Secrets configurados correctamente"
+
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
