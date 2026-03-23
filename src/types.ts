@@ -31,6 +31,8 @@ export type MessageData =
       message: never;
       date: never;
       status: "sent" | "delivered" | "seen";
+      sender?: string;
+      receiver?: string;
     };
 export type msgUpdate = { type: "status-update"; id: string };
 export interface MyWebSocket extends WebSocket {

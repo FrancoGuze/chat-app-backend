@@ -1,9 +1,10 @@
 import type { MyWebSocket, MessageData } from "../../types.js";
 import type { UserService, MessageService } from "../../services/servicesTypes.js";
+import { ActiveConnectionsManager } from "../../realtime/activeConnectionsManager.js";
 
 type AuthHandlerDeps = {
   ws: MyWebSocket;
-  activeClients: Map<string, MyWebSocket>;
+  activeConnections: ActiveConnectionsManager;
   payload: MessageData;
   userService: UserService;
   messageService: MessageService;
@@ -11,7 +12,7 @@ type AuthHandlerDeps = {
 
 export const handleAuth = async ({
   ws,
-  activeClients,
+  activeConnections,
   payload,
   userService,
   messageService,
@@ -28,7 +29,7 @@ export const handleAuth = async ({
   }
 
   ws.user = userName;
-  activeClients.set(userName, ws);
+  activeConnections.add(userName, ws);
 
   const { user, contacts } = await userService.authenticateUser(userName);
   const contactNames = contacts.map((contact) => contact.name);
