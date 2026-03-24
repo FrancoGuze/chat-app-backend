@@ -33,8 +33,31 @@ export type MessageData =
       status: "sent" | "delivered" | "seen";
       sender?: string;
       receiver?: string;
+    }
+  | {
+      type: "find-contact";
+      username: string;
+      from: never;
+      to: never;
+      id: never;
+      message: never;
+      date: never;
+      ids: never;
+      status: never;
     };
 export type msgUpdate = { type: "status-update"; id: string };
+
+export type ServerWSEvent =
+  | {
+      type: "auth";
+      payload: { message: string; contacts: { id: string; name: string }[]; userId?: string };
+    }
+  | { type: "message-history"; payload: { messages: MessageData[] } }
+  | { type: "new-contact"; payload: { id: string; name: string } }
+  | { type: "new-msg"; payload: { message: MessageData } }
+  | { type: "status-update"; payload: { ids: string[]; status: "sent" | "delivered" | "seen" } }
+  | { type: "contact-found"; payload: { id: string; username: string } }
+  | { type: "contact-not-found"; payload: { username: string } };
 export interface MyWebSocket extends WebSocket {
   user?: string;
 }

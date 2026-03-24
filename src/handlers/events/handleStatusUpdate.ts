@@ -37,8 +37,10 @@ export const handleStatusUpdate = async ({
   senderWs?.send(
     JSON.stringify({
       type: "status-update",
-      ids,
-      status,
+      payload: {
+        ids,
+        status,
+      },
     })
   );
 };

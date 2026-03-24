@@ -41,6 +41,7 @@ const wsHandlers = createWsHandlers({
 });
 
 wss.on("connection", (ws: MyWebSocket, _req: IncomingMessage) => {
+  console.log("Usuario nuevo conectado")
   ws.on("message", async (data: any) => {
     let payload: MessageData | null = null;
     try {
@@ -52,10 +53,13 @@ wss.on("connection", (ws: MyWebSocket, _req: IncomingMessage) => {
     }
 
     if (!payload) return;
+    console.log("Tipo recibido: ",payload.type,wsHandlers[payload.type])
     await handleWsMessage(ws, payload, wsHandlers);
   });
 
-  ws.on("close", () => handleWsClose(ws, activeConnections));
+  ws.on("close", () => {
+    console.log("Usuario desconectado")
+    handleWsClose(ws, activeConnections)});
 });
 
 app.get("/", (_req: Request, res: Response) => {

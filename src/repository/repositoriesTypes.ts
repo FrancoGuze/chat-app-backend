@@ -9,6 +9,7 @@ type User = {
 export interface UserRepository {
     create: (name: string) => Promise<User | null>,
     findByName: (name: string) => Promise<User | null>,
+    findById: (id: string) => Promise<User | null>,
     findOrCreateByName: (name: string) => Promise<User | null>
 }
 

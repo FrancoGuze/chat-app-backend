@@ -3,6 +3,7 @@ import type { UserService, MessageService } from "../services/servicesTypes.js";
 import { ActiveConnectionsManager } from "../realtime/activeConnectionsManager.js";
 
 import { handleAuth } from "./events/handleAuth.js";
+import { handleFindContact } from "./events/handleFindContact.js";
 import { handleMessage } from "./events/handleMessage.js";
 import { handleStatusUpdate } from "./events/handleStatusUpdate.js";
 
@@ -21,6 +22,7 @@ export type WsHandlers = {
   auth: WsHandlerFn;
   msg: WsHandlerFn;
   "status-update": WsHandlerFn;
+  "find-contact": WsHandlerFn;
 };
 
 export const createWsHandlers = (deps: WsHandlerDeps): WsHandlers => {
@@ -49,6 +51,10 @@ export const createWsHandlers = (deps: WsHandlerDeps): WsHandlers => {
         activeConnections: deps.activeConnections,
         messageService: deps.messageService,
       });
+    },
+    "find-contact": async (ws, payload) => {
+      if (payload.type !== "find-contact") return;
+      await handleFindContact(ws, payload);
     },
   };
 };

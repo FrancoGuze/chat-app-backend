@@ -32,19 +32,42 @@ export const handleAuth = async ({
   activeConnections.add(userName, ws);
 
   const { user, contacts } = await userService.authenticateUser(userName);
-  const contactNames = contacts.map((contact) => contact.name);
+  const contactsWire = contacts.map((c) => ({ id: c.id, name: c.name }));
 
   ws.send(
     JSON.stringify({
       type: "auth",
-      message: "Autenticacion recibida",
-      contacts: contactNames,
-      userId: user?.id,
+      payload: {
+        message: "Autenticacion recibida",
+        contacts: contactsWire,
+        userId: user?.id,
+      },
     })
   );
 
-  const messages = await messageService.restoreMessages(userName);
+  if (!user?.id) return;
+
+  const messages = await messageService.restoreMessages(user.id);
+  console.log(
+    "[handleAuth] restore for",
+    userName,
+    "user.id",
+    user.id,
+    "messages",
+    messages.length
+  );
   if (!messages.length) return;
+
+  const idToName = new Map<string, string>();
+  idToName.set(user.id, user.name);
+  contacts.forEach((c) => idToName.set(c.id, c.name));
+
+  const toWire = (msg: MessageData) => ({
+    ...msg,
+    type: "msg" as const,
+    from: idToName.get(msg.from) ?? msg.from,
+    to: idToName.get(msg.to) ?? msg.to,
+  });
 
   const sortedByDate = [...messages].sort((msgA, msgB) => {
     const a = new Date(msgA.date);
@@ -55,7 +78,9 @@ export const handleAuth = async ({
   ws.send(
     JSON.stringify({
       type: "message-history",
-      messages: sortedByDate,
+      payload: {
+        messages: sortedByDate.map(toWire),
+      },
     })
   );
 };

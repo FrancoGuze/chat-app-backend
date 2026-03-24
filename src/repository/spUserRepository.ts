@@ -1,4 +1,4 @@
-﻿import { supabase } from "../supabase.js";
+import { supabase } from "../supabase.js";
 import type { UserRepository } from "./repositoriesTypes.js";
 
 type User = {
@@ -42,6 +42,25 @@ export class SupabaseUserRepository implements UserRepository {
 
     if (error) {
       console.error("findByName error:", error);
+      return null;
+    }
+
+    return (data as User) || null;
+  }
+
+  async findById(id: string): Promise<User | null> {
+    if (!supabase) return null;
+    const trimmed = id.trim();
+    if (!trimmed) return null;
+
+    const { data, error } = await supabase
+      .from("users")
+      .select("id,name,created_at")
+      .eq("id", trimmed)
+      .maybeSingle();
+
+    if (error) {
+      console.error("findById error:", error);
       return null;
     }
 

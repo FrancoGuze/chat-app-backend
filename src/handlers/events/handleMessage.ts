@@ -20,26 +20,48 @@ export const handleMessage = async ({
     return;
   }
 
-  const sender = payload.from?.trim();
-  const receiver = payload.to?.trim();
   const message = payload.message?.trim();
 
-  if (!sender || !receiver || !message) {
+  if (!message) {
     console.error("handleMessage invalid message payload");
     return;
   }
 
-  const receiverWs = activeConnections.get(receiver);
+  const { saved, broadcast, peers } = await messageService.sendMessage(payload);
 
-  const { saved } = await messageService.sendMessage(payload);
-
-  if (saved) {
-    ws.send(JSON.stringify({ type: "new-contact", contact: receiver }));
-    receiverWs?.send(
-      JSON.stringify({ type: "new-contact", contact: sender })
-    );
-
-    ws.send(JSON.stringify({ type: "new-msg", message: payload }));
-    receiverWs?.send(JSON.stringify({ type: "new-msg", message: payload }));
+  if (!saved || !broadcast || !peers) {
+    return;
   }
+
+  const receiverWs = activeConnections.get(broadcast.to);
+
+  ws.send(
+    JSON.stringify({
+      type: "new-contact",
+      payload: { id: peers.to.id, name: peers.to.name },
+    })
+  );
+  receiverWs?.send(
+    JSON.stringify({
+      type: "new-contact",
+      payload: { id: peers.from.id, name: peers.from.name },
+    })
+  );
+
+  ws.send(
+    JSON.stringify({
+      type: "new-msg",
+      payload: {
+        message: broadcast,
+      },
+    })
+  );
+  receiverWs?.send(
+    JSON.stringify({
+      type: "new-msg",
+      payload: {
+        message: broadcast,
+      },
+    })
+  );
 };

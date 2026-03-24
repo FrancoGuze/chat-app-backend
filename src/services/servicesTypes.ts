@@ -22,10 +22,20 @@ export interface ContactService {
   ) => Promise<{ created: boolean }>;
 }
 
+export type MessageSendPeers = {
+  from: { id: string; name: string };
+  to: { id: string; name: string };
+};
+
 export interface MessageService {
   sendMessage: (
     payload: MessageData
-  ) => Promise<{ saved: boolean; createdContact: boolean }>;
+  ) => Promise<{
+    saved: boolean;
+    createdContact: boolean;
+    broadcast?: MessageData;
+    peers?: MessageSendPeers;
+  }>;
   restoreMessages: (userId: string) => Promise<MessageData[]>;
   updateMessageStatus: (
     ids: string[],
